@@ -1,29 +1,24 @@
 #include <Windows.h>
 #include <tchar.h>
 #include <gl/gl.h>
+#include <gl/glu.h>
 
 #ifdef __cplusplus
 #error Compile it as C.
 #endif
 
-TCHAR *className  = _T("ptb");
+TCHAR *className  = _T("PressTheButton");
 TCHAR *windowName = _T("Press The Button");
-int winX = 300, winY = 300;
 int winWidth = 300, winHeight = 300;
 
 HDC hDC;
 HGLRC hGLRC;
 HPALETTE hPalette;
-
 BOOL buttonPressed;
 
 void
 init()
 {
-	/* set viewing projection */
-	glMatrixMode(GL_PROJECTION);
-	glFrustum(-0.5F, 0.5F, -0.5F, 0.5F, 1.0F, 3.0F);
-
 	/* position viewer */
 	glMatrixMode(GL_MODELVIEW);
 	glTranslatef(0.0F, 0.0F, -2.0F);
@@ -79,6 +74,11 @@ resize()
 {
 	/* set viewport to cover the window */
 	glViewport(0, 0, winWidth, winHeight);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(90.0, (GLdouble)winWidth / winHeight, 0.1, 7.0);
+	glMatrixMode(GL_MODELVIEW);
 }
 
 void
@@ -188,9 +188,8 @@ WndProc(
 				wglDeleteContext(hGLRC);
 			}
 			if (hPalette)
-			{
 				DeleteObject(hPalette);
-			}
+
 			ReleaseDC(hWnd, hDC);
 			PostQuitMessage(0);
 			return 0;
@@ -210,7 +209,8 @@ WndProc(
 		case WM_PALETTECHANGED:
 		{
 			/* realize palette if this is *not* the current window */
-			if (hGLRC && hPalette && (HWND)wParam != hWnd) {
+			if (hGLRC && hPalette && (HWND)wParam != hWnd)
+			{
 				UnrealizeObject(hPalette);
 				SelectPalette(hDC, hPalette, FALSE);
 				RealizePalette(hDC);
@@ -222,7 +222,8 @@ WndProc(
 		case WM_QUERYNEWPALETTE:
 		{
 			/* realize palette if this is the current window */
-			if (hGLRC && hPalette) {
+			if (hGLRC && hPalette)
+			{
 				UnrealizeObject(hPalette);
 				SelectPalette(hDC, hPalette, FALSE);
 				RealizePalette(hDC);
@@ -288,17 +289,39 @@ WinMain(
 		.hInstance     = hCurrentInst,
 		.hIcon         = LoadIcon(NULL, IDI_APPLICATION),
 		.hCursor       = LoadCursor(NULL, IDC_ARROW),
-		.hbrBackground = GetStockObject(BLACK_BRUSH),
+		.hbrBackground = NULL,
 		.lpszClassName = className
 	};
-	RegisterClass(&wndClass);
+	if (!RegisterClass(&wndClass))
+	{
+		MessageBox(
+			NULL,
+			"RegisterClass failed.",
+			"Error",
+			MB_ICONERROR | MB_OK);
+		exit(1);
+	}
 
-	/* create window */
-	hWnd = CreateWindow(
-		className, windowName,
-		WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
-		winX, winY, winWidth, winHeight,
+	winWidth  = GetSystemMetrics(SM_CXSCREEN);
+	winHeight = GetSystemMetrics(SM_CYSCREEN);
+
+	hWnd = CreateWindowEx(
+		WS_EX_WINDOWEDGE | WS_EX_APPWINDOW,
+		className,
+		windowName,
+		WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
+		0, 0, winWidth, winHeight,
 		NULL, NULL, hCurrentInst, NULL);
+
+	if (!hWnd)
+	{
+		MessageBox(
+			NULL,
+			"CreateWindow failed.",
+			"Error",
+			MB_ICONERROR | MB_OK);
+		exit(1);
+	}
 
 	/* display window */
 	ShowWindow(hWnd, nCmdShow);
