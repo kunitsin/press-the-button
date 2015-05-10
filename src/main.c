@@ -1,6 +1,6 @@
 #include <Windows.h>
 #include <tchar.h>
-#include <GL/gl.h>
+#include <gl/gl.h>
 
 #ifdef __cplusplus
 #error Compile it as C.
@@ -96,14 +96,22 @@ setupPixelFormat(
 	};
 
 	const int pixelFormat = ChoosePixelFormat(hDC, &pfd);
-	if (pixelFormat == 0) {
-		MessageBox(WindowFromDC(hDC), "ChoosePixelFormat failed.", "Error",
+	if (pixelFormat == 0)
+	{
+		MessageBox(
+			WindowFromDC(hDC),
+			"ChoosePixelFormat failed.",
+			"Error",
 			MB_ICONERROR | MB_OK);
 		exit(1);
 	}
 
-	if (SetPixelFormat(hDC, pixelFormat, &pfd) != TRUE) {
-		MessageBox(WindowFromDC(hDC), "SetPixelFormat failed.", "Error",
+	if (!SetPixelFormat(hDC, pixelFormat, &pfd))
+	{
+		MessageBox(
+			WindowFromDC(hDC),
+			"SetPixelFormat failed.",
+			"Error",
 			MB_ICONERROR | MB_OK);
 		exit(1);
 	}
@@ -130,9 +138,8 @@ setupPalette(
 		const int redMask   = (1 << pfd.cRedBits  ) - 1;
 		const int greenMask = (1 << pfd.cGreenBits) - 1;
 		const int blueMask  = (1 << pfd.cBlueBits ) - 1;
-		int i;
 
-		for (i = 0; i < paletteSize; ++i)
+		for (int i = 0; i < paletteSize; ++i)
 		{
 			pPal->palPalEntry[i] = (PALETTEENTRY){
 				(((i >> pfd.cRedShift  ) & redMask  ) * 255) / redMask,
@@ -146,7 +153,8 @@ setupPalette(
 	hPalette = CreatePalette(pPal);
 	free(pPal);
 
-	if (hPalette) {
+	if (hPalette)
+	{
 		SelectPalette(hDC, hPalette, FALSE);
 		RealizePalette(hDC);
 	}
@@ -174,11 +182,13 @@ WndProc(
 		case WM_DESTROY:
 		{
 			/* finish OpenGL rendering */
-			if (hGLRC) {
+			if (hGLRC)
+			{
 				wglMakeCurrent(NULL, NULL);
 				wglDeleteContext(hGLRC);
 			}
-			if (hPalette) {
+			if (hPalette)
+			{
 				DeleteObject(hPalette);
 			}
 			ReleaseDC(hWnd, hDC);
