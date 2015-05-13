@@ -351,6 +351,7 @@ WinMain(
 		LARGE_INTEGER iterEnd;
 		QueryPerformanceCounter(&iterEnd);
 		
-		Sleep((sleepTill - iterEnd.QuadPart) / 1000);
+		if (sleepTill > iterEnd.QuadPart)
+			Sleep((sleepTill - iterEnd.QuadPart) / 1000);
 	}
 }
