@@ -7,6 +7,8 @@
 #error Compile it as C.
 #endif
 
+#define MAX_FPS 120
+
 TCHAR *className  = _T("PressTheButton");
 TCHAR *windowName = _T("Press The Button");
 int winWidth = 300, winHeight = 300;
@@ -167,7 +169,8 @@ WndProc(
 	WPARAM wParam,
 	LPARAM lParam)
 {
-	switch (message) {
+	switch (message)
+	{
 		case WM_CREATE:
 		{
 			/* initialize OpenGL rendering */
@@ -280,7 +283,6 @@ WinMain(
 	int nCmdShow)
 {
 	HWND hWnd;
-	MSG msg;
 
 	/* register window class */
 	const WNDCLASS wndClass = {
@@ -325,13 +327,30 @@ WinMain(
 
 	/* display window */
 	ShowWindow(hWnd, nCmdShow);
-	UpdateWindow(hWnd);
 
-	/* process messages */
-	while (GetMessage(&msg, NULL, 0, 0) == TRUE)
+	/* game loop */
+	while (1)
 	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		/* query time */
+		LARGE_INTEGER iterStart;
+		QueryPerformanceCounter(&iterStart);
+
+		/* process Windows messages */
+		MSG msg;
+		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		{
+			if (msg.message == WM_QUIT)
+				return msg.wParam;
+
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+
+		/* wait for MAX_FPS threshold */
+		const __int64 sleepTill = iterStart.QuadPart + 1. / MAX_FPS * 1000000;
+		LARGE_INTEGER iterEnd;
+		QueryPerformanceCounter(&iterEnd);
+		
+		Sleep((sleepTill - iterEnd.QuadPart) / 1000);
 	}
-	return msg.wParam;
 }
