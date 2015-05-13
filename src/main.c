@@ -2,6 +2,7 @@
 #include <tchar.h>
 #include <gl/gl.h>
 #include <gl/glu.h>
+#include <inttypes.h>
 
 #ifdef __cplusplus
 #error Compile it as C.
@@ -347,7 +348,7 @@ WinMain(
 		}
 
 		/* wait for MAX_FPS threshold */
-		const __int64 sleepTill = iterStart.QuadPart + 1. / MAX_FPS * 1000000;
+		const int64_t sleepTill = iterStart.QuadPart + (int64_t)(1. / MAX_FPS * 1000000);
 		LARGE_INTEGER iterEnd;
 		QueryPerformanceCounter(&iterEnd);
 		
