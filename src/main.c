@@ -1,3 +1,5 @@
+// Some code is taken from http://www.cs.rit.edu/~ncs/Courses/570/UserGuide/OpenGLonWin-11.html.
+
 #include <Windows.h>
 #include <tchar.h>
 #include <gl/gl.h>
