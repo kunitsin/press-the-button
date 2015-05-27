@@ -3,3 +3,4 @@
 *.opensdf
 src/Debug/
 src/Release/
+src/freetype-2.5.5/objs/
