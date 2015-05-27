@@ -13,6 +13,17 @@
   <ItemGroup>
     <ClCompile Include="main.c" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="freetype-2.5.5\builds\windows\vc2013\freetype.vcxproj">
+      <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="..\Raleway-ExtraLight.ttf">
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+      <DeploymentContent>false</DeploymentContent>
+    </Font>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{725956B1-155F-4262-BA47-11550F42D925}</ProjectGuid>
     <RootNamespace>pressthebutton</RootNamespace>
@@ -72,4 +83,15 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <Target Name="AfterBuild">
+    <Copy SourceFiles="..\Raleway-ExtraLight.ttf" DestinationFolder="$(TargetDir)"/>
+  </Target>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>

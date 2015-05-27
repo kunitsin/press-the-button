@@ -6,6 +6,9 @@
 #include <gl/glu.h>
 #include <inttypes.h>
 
+#include "freetype-2.5.5/include/ft2build.h"
+#include FT_FREETYPE_H
+
 #ifdef __cplusplus
 #error Compile it as C.
 #endif
@@ -20,6 +23,7 @@ HDC hDC;
 HGLRC hGLRC;
 HPALETTE hPalette;
 BOOL buttonPressed;
+FT_Library library;
 
 void
 init()
@@ -35,6 +39,13 @@ init()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
+
+	if (FT_Init_FreeType(&library))
+		exit(-1);
+
+	FT_Face face;
+	if (FT_New_Face(library, "Raleway-ExtraLight.ttf", 0, &face))
+		exit(-1);
 }
 
 void
