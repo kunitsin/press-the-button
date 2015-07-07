@@ -28,18 +28,6 @@ FT_Library library;
 void
 init()
 {
-	/* position viewer */
-	glMatrixMode(GL_MODELVIEW);
-	glTranslatef(0.0F, 0.0F, -2.0F);
-
-	/* position object */
-	glRotatef(30.0F, 1.0F, 0.0F, 0.0F);
-	glRotatef(30.0F, 0.0F, 1.0F, 0.0F);
-
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-
 	if (FT_Init_FreeType(&library))
 		exit(-1);
 
@@ -52,34 +40,11 @@ void
 redraw()
 {
 	glClearColor(0.0F, 0.0F, buttonPressed ? 1.0F : 0.0F, 1.0F);
-	/* clear color and depth buffers */
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 
-	/* draw six faces of a cube */
 	glBegin(GL_QUADS);
-	glNormal3f(0.0F, 0.0F, 1.0F);
-	glVertex3f(0.5F, 0.5F, 0.5F); glVertex3f(-0.5F, 0.5F, 0.5F);
-	glVertex3f(-0.5F, -0.5F, 0.5F); glVertex3f(0.5F, -0.5F, 0.5F);
-
-	glNormal3f(0.0F, 0.0F, -1.0F);
-	glVertex3f(-0.5F, -0.5F, -0.5F); glVertex3f(-0.5F, 0.5F, -0.5F);
-	glVertex3f(0.5F, 0.5F, -0.5F); glVertex3f(0.5F, -0.5F, -0.5F);
-
-	glNormal3f(0.0F, 1.0F, 0.0F);
-	glVertex3f(0.5F, 0.5F, 0.5F); glVertex3f(0.5F, 0.5F, -0.5F);
-	glVertex3f(-0.5F, 0.5F, -0.5F); glVertex3f(-0.5F, 0.5F, 0.5F);
-
-	glNormal3f(0.0F, -1.0F, 0.0F);
-	glVertex3f(-0.5F, -0.5F, -0.5F); glVertex3f(0.5F, -0.5F, -0.5F);
-	glVertex3f(0.5F, -0.5F, 0.5F); glVertex3f(-0.5F, -0.5F, 0.5F);
-
-	glNormal3f(1.0F, 0.0F, 0.0F);
-	glVertex3f(0.5F, 0.5F, 0.5F); glVertex3f(0.5F, -0.5F, 0.5F);
-	glVertex3f(0.5F, -0.5F, -0.5F); glVertex3f(0.5F, 0.5F, -0.5F);
-
-	glNormal3f(-1.0F, 0.0F, 0.0F);
-	glVertex3f(-0.5F, -0.5F, -0.5F); glVertex3f(-0.5F, -0.5F, 0.5F);
-	glVertex3f(-0.5F, 0.5F, 0.5F); glVertex3f(-0.5F, 0.5F, -0.5F);
+	glVertex2f(0.5F, 0.5F); glVertex2f(-0.5F, 0.5F);
+	glVertex2f(-0.7F, -0.5F); glVertex2f(0.5F, -0.5F);
 	glEnd();
 
 	SwapBuffers(hDC);
@@ -90,11 +55,6 @@ resize()
 {
 	/* set viewport to cover the window */
 	glViewport(0, 0, winWidth, winHeight);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(90.0, (GLdouble)winWidth / winHeight, 0.1, 7.0);
-	glMatrixMode(GL_MODELVIEW);
 }
 
 void
