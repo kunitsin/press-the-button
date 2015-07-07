@@ -2,7 +2,7 @@
 
 #include <Windows.h>
 #include <tchar.h>
-#include <gl/gl.h>
+#include "glcorearb.h"
 #include <gl/glu.h>
 #include <inttypes.h>
 

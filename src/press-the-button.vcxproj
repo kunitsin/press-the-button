@@ -24,6 +24,9 @@
       <DeploymentContent>false</DeploymentContent>
     </Font>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="glcorearb.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{725956B1-155F-4262-BA47-11550F42D925}</ProjectGuid>
     <RootNamespace>pressthebutton</RootNamespace>
@@ -84,7 +87,7 @@
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
   <Target Name="AfterBuild">
-    <Copy SourceFiles="..\Raleway-ExtraLight.ttf" DestinationFolder="$(TargetDir)"/>
+    <Copy SourceFiles="..\Raleway-ExtraLight.ttf" DestinationFolder="$(TargetDir)" />
   </Target>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>
