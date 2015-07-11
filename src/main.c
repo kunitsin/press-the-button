@@ -2,8 +2,8 @@
 
 #include <Windows.h>
 #include <tchar.h>
+#include <gl/gl.h>
 #include "glcorearb.h"
-#include <gl/glu.h>
 #include <inttypes.h>
 
 #include "freetype-2.5.5/include/ft2build.h"
@@ -43,8 +43,8 @@ redraw()
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glBegin(GL_QUADS);
-	glVertex2f(0.5F, 0.5F); glVertex2f(-0.5F, 0.5F);
-	glVertex2f(-0.7F, -0.5F); glVertex2f(0.5F, -0.5F);
+	glVertex2f(100., 100.); glVertex2f(50., 100.);
+	glVertex2f(0., 50.); glVertex2f(100., 50.);
 	glEnd();
 
 	SwapBuffers(hDC);
@@ -53,8 +53,13 @@ redraw()
 void
 resize()
 {
-	/* set viewport to cover the window */
 	glViewport(0, 0, winWidth, winHeight);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, winWidth, winHeight, 0, -1.0, 1.0);
+
+	glMatrixMode(GL_MODELVIEW);
 }
 
 void
