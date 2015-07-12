@@ -2,9 +2,10 @@
 
 #include <Windows.h>
 #include <tchar.h>
-#include <gl/gl.h>
-#include "glcorearb.h"
 #include <inttypes.h>
+
+#define GLEW_STATIC
+#include "glew.h"
 
 #include "freetype-2.5.5/include/ft2build.h"
 #include FT_FREETYPE_H

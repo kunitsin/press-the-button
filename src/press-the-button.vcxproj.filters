@@ -18,12 +18,18 @@
     <ClCompile Include="main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="glew.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Font Include="..\Raleway-ExtraLight.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="glcorearb.h">
+    <ClInclude Include="glew.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="wglew.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
