@@ -29,12 +29,35 @@ FT_Library library;
 void
 init()
 {
+	if (glewInit() != GLEW_OK)
+		exit(-1);
+	if (!GLEW_VERSION_1_3)
+		exit(-1);
+
 	if (FT_Init_FreeType(&library))
 		exit(-1);
 
 	FT_Face face;
 	if (FT_New_Face(library, "Raleway-ExtraLight.ttf", 0, &face))
 		exit(-1);
+
+	FT_Set_Pixel_Sizes(face, 0, 48);
+
+	if (FT_Load_Char(face, 'X', FT_LOAD_RENDER))
+		exit(-1);
+
+	GLuint texture;
+	glActiveTexture(GL_TEXTURE0);
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 }
 
 void
@@ -44,8 +67,10 @@ redraw()
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glBegin(GL_QUADS);
-	glVertex2f(100., 100.); glVertex2f(50., 100.);
-	glVertex2f(0., 50.); glVertex2f(100., 50.);
+	glVertex2f(100., 100.);
+	glVertex2f(50., 100.);
+	glVertex2f(0., 50.);
+	glVertex2f(100., 50.);
 	glEnd();
 
 	SwapBuffers(hDC);
@@ -217,10 +242,9 @@ WndProc(
 		}
 		case WM_PAINT:
 		{
+			/* we must handle repaint by ourselves */
 			PAINTSTRUCT ps;
 			BeginPaint(hWnd, &ps);
-			if (hGLRC)
-				redraw();
 			EndPaint(hWnd, &ps);
 			return 0;
 		}
@@ -239,16 +263,14 @@ WndProc(
 		}
 		case WM_KEYDOWN:
 		{
-			if (wParam == 0x57)
+			if (wParam == 0x57 /* w */)
 				buttonPressed = TRUE;
-			RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
 			break;
 		}
 		case WM_KEYUP:
 		{
-			if (wParam == 0x57)
+			if (wParam == 0x57 /* w */)
 				buttonPressed = FALSE;
-			RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
 			break;
 		}
 	}
@@ -284,8 +306,8 @@ WinMain(
 		exit(1);
 	}
 
-	winWidth  = GetSystemMetrics(SM_CXSCREEN);
-	winHeight = GetSystemMetrics(SM_CYSCREEN);
+	/*winWidth  = GetSystemMetrics(SM_CXSCREEN);
+	winHeight = GetSystemMetrics(SM_CYSCREEN);*/
 
 	hWnd = CreateWindowEx(
 		WS_EX_WINDOWEDGE | WS_EX_APPWINDOW,
@@ -325,6 +347,8 @@ WinMain(
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
+
+		redraw();
 
 		/* wait for MAX_FPS threshold */
 		const int64_t sleepTill = iterStart.QuadPart + (int64_t)(1. / MAX_FPS * 1000000);
