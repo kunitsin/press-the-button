@@ -25,6 +25,9 @@ HGLRC hGLRC;
 HPALETTE hPalette;
 BOOL buttonPressed;
 FT_Library library;
+LARGE_INTEGER iterStart;
+
+static int PHASE_LEN = 10000000;
 
 void
 init()
@@ -63,14 +66,35 @@ init()
 void
 redraw()
 {
-	glClearColor(0.0F, 0.0F, buttonPressed ? 1.0F : 0.0F, 1.0F);
+	int phase = iterStart.QuadPart % PHASE_LEN;
+	float r, g, b;
+	if (phase < PHASE_LEN / 3)
+	{
+		g = phase / (PHASE_LEN / 3.);
+		r = 1. - g;
+		b = 0;
+	}
+	else if (phase < PHASE_LEN / 3 * 2)
+	{
+		b = (phase - PHASE_LEN / 3.) / (PHASE_LEN / 3.);
+		g = 1. - b;
+		r = 0;
+	}
+	else
+	{
+		r = (phase - PHASE_LEN / 3. * 2) / (PHASE_LEN / 3.);
+		b = 1. - r;
+		g = 0;
+	}
+
+	glClearColor(r, g, b, 1.0F);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glBegin(GL_QUADS);
-	glVertex2f(100., 100.);
+	/*glVertex2f(100., 100.);
 	glVertex2f(50., 100.);
 	glVertex2f(0., 50.);
-	glVertex2f(100., 50.);
+	glVertex2f(100., 50.);*/
 	glEnd();
 
 	SwapBuffers(hDC);
@@ -306,8 +330,8 @@ WinMain(
 		exit(1);
 	}
 
-	/*winWidth  = GetSystemMetrics(SM_CXSCREEN);
-	winHeight = GetSystemMetrics(SM_CYSCREEN);*/
+	winWidth  = GetSystemMetrics(SM_CXSCREEN);
+	winHeight = GetSystemMetrics(SM_CYSCREEN);
 
 	hWnd = CreateWindowEx(
 		WS_EX_WINDOWEDGE | WS_EX_APPWINDOW,
@@ -334,7 +358,6 @@ WinMain(
 	while (1)
 	{
 		/* query time */
-		LARGE_INTEGER iterStart;
 		QueryPerformanceCounter(&iterStart);
 
 		/* process Windows messages */
