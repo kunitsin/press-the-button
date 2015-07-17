@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <tchar.h>
 #include <inttypes.h>
+#include <math.h>
 
 #define GLEW_STATIC
 #include "glew.h"
@@ -86,6 +87,11 @@ redraw()
 		b = 1. - r;
 		g = 0;
 	}
+
+	/* gamma correction (luminance to RGB) */
+	r = pow(r, 1/2.2);
+	g = pow(g, 1/2.2);
+	b = pow(b, 1/2.2);
 
 	glClearColor(r, g, b, 1.0F);
 	glClear(GL_COLOR_BUFFER_BIT);
