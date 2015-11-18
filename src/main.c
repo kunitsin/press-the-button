@@ -3,6 +3,8 @@
 #include <Windows.h>
 #include <tchar.h>
 #include <inttypes.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #define GLEW_STATIC
@@ -29,6 +31,12 @@ FT_Library library;
 LARGE_INTEGER iterStart;
 
 static int PHASE_LEN = 10000000;
+
+struct Vector2
+{
+	GLfloat x;
+	GLfloat y;
+};
 
 void
 init()
@@ -98,11 +106,35 @@ redraw()
 	glClearColor(r, g, b, 1.0F);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glBegin(GL_QUADS);
-	/*glVertex2f(100., 100.);
-	glVertex2f(50., 100.);
-	glVertex2f(0., 50.);
-	glVertex2f(100., 50.);*/
+	glColor3f(1, 1, 1);
+
+	glBegin(GL_TRIANGLE_FAN);
+
+	const int CircleFaces = 200;
+	const int CircleRadius = 500;
+	const struct Vector2 circle_center = {.x = winWidth / 2, .y = winHeight / 2};
+	glVertex2f(circle_center.x, circle_center.y);
+
+	for (int i = 0; i < CircleFaces + 1; i++)
+	{
+		float angle = i * M_PI * 2 / CircleFaces;
+		const struct Vector2 circle_point = {
+			circle_center.x + sin(angle) * CircleRadius,
+			circle_center.y - cos(angle) * CircleRadius
+		};
+
+		glVertex2f(circle_point.x, circle_point.y);
+
+		if (i == 30)
+		{
+			glEnd();
+			glColor3f(0.1, 0.1, 0.1);
+			glBegin(GL_TRIANGLE_FAN);
+			glVertex2f(circle_center.x, circle_center.y);
+			glVertex2f(circle_point.x, circle_point.y);
+		}
+	}
+
 	glEnd();
 
 	glFinish();
@@ -279,6 +311,10 @@ WndProc(
 			BeginPaint(hWnd, &ps);
 			EndPaint(hWnd, &ps);
 			return 0;
+		}
+		case WM_ERASEBKGND:
+		{
+			return 1;
 		}
 		case WM_CHAR:
 		{
