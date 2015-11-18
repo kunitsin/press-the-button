@@ -38,6 +38,8 @@ init()
 	if (!GLEW_VERSION_1_3)
 		exit(-1);
 
+	glDrawBuffer(GL_FRONT);
+
 	if (FT_Init_FreeType(&library))
 		exit(-1);
 
@@ -103,7 +105,7 @@ redraw()
 	glVertex2f(100., 50.);*/
 	glEnd();
 
-	SwapBuffers(hDC);
+	glFinish();
 }
 
 void
@@ -125,7 +127,7 @@ setupPixelFormat(
 	const PIXELFORMATDESCRIPTOR pfd = {
 		.nSize      = sizeof(PIXELFORMATDESCRIPTOR),
 		.nVersion   = 1,
-		.dwFlags    = PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW | PFD_DOUBLEBUFFER,
+		.dwFlags    = PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW,
 		.iPixelType = PFD_TYPE_RGBA,
 		.cColorBits = 16,
 		.cDepthBits = 16,
