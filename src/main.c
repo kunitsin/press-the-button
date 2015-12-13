@@ -29,6 +29,7 @@ HPALETTE hPalette;
 BOOL buttonPressed;
 FT_Library library;
 LARGE_INTEGER iterStart;
+GLuint texture;
 
 static int PHASE_LEN = 10000000;
 
@@ -47,6 +48,7 @@ init()
 		exit(-1);
 
 	glDrawBuffer(GL_FRONT);
+	glEnable(GL_TEXTURE_2D);
 
 	if (FT_Init_FreeType(&library))
 		exit(-1);
@@ -60,7 +62,6 @@ init()
 	if (FT_Load_Char(face, 'X', FT_LOAD_RENDER))
 		exit(-1);
 
-	GLuint texture;
 	glActiveTexture(GL_TEXTURE0);
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -71,7 +72,20 @@ init()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+	// Disable alignment in glTexImage2D
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, face->glyph->bitmap.width, face->glyph->bitmap.rows, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
+
+	for (size_t i = 0; i < face->glyph->bitmap.rows; i++)
+	{
+		for (size_t j = 0; j < face->glyph->bitmap.width; j++)
+			OutputDebugString(face->glyph->bitmap.buffer[i*face->glyph->bitmap.width+j] >= 128 ? _T("X") : _T("-"));
+
+		OutputDebugString(_T("\n"));
+	}
+
+	FT_Done_Face(face);
 }
 
 void
@@ -135,6 +149,15 @@ redraw()
 		}
 	}
 
+	glEnd();
+
+	glBegin(GL_QUADS);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexCoord2f(0, 0); glVertex3f(0, 0, 0);
+	glTexCoord2f(0, 1); glVertex3f(0, 100, 0);
+	glTexCoord2f(1, 1); glVertex3f(100, 100, 0);
+	glTexCoord2f(1, 0); glVertex3f(100, 0, 0);
 	glEnd();
 
 	glFinish();
