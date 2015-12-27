@@ -6,12 +6,9 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
-
-#define GLEW_STATIC
 #include "glew.h"
 
-#include "freetype-2.5.5/include/ft2build.h"
-#include FT_FREETYPE_H
+#include "text.h"
 
 #ifdef __cplusplus
 #error Compile it as C.
@@ -27,9 +24,9 @@ HDC hDC;
 HGLRC hGLRC;
 HPALETTE hPalette;
 BOOL buttonPressed;
-FT_Library library;
 LARGE_INTEGER iterStart;
-GLuint texture;
+GLint texture;
+unsigned int texw, texh;
 
 static int PHASE_LEN = 10000000;
 
@@ -49,43 +46,17 @@ init()
 
 	glDrawBuffer(GL_FRONT);
 	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	if (FT_Init_FreeType(&library))
+	if (glGetError() != GL_NO_ERROR)
 		exit(-1);
 
-	FT_Face face;
-	if (FT_New_Face(library, "Raleway-ExtraLight.ttf", 0, &face))
+	if (init_text())
 		exit(-1);
 
-	FT_Set_Pixel_Sizes(face, 0, 48);
-
-	if (FT_Load_Char(face, 'X', FT_LOAD_RENDER))
+	if (render_text("testing", &texture, &texw, &texh))
 		exit(-1);
-
-	glActiveTexture(GL_TEXTURE0);
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	// Disable alignment in glTexImage2D
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, face->glyph->bitmap.width, face->glyph->bitmap.rows, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
-
-	for (size_t i = 0; i < face->glyph->bitmap.rows; i++)
-	{
-		for (size_t j = 0; j < face->glyph->bitmap.width; j++)
-			OutputDebugString(face->glyph->bitmap.buffer[i*face->glyph->bitmap.width+j] >= 128 ? _T("X") : _T("-"));
-
-		OutputDebugString(_T("\n"));
-	}
-
-	FT_Done_Face(face);
 }
 
 void
@@ -117,10 +88,8 @@ redraw()
 	g = pow(g, 1/2.2);
 	b = pow(b, 1/2.2);
 
-	glClearColor(r, g, b, 1.0F);
+	glClearColor(r, g, b, 0);
 	glClear(GL_COLOR_BUFFER_BIT);
-
-	glColor3f(1, 1, 1);
 
 	glBegin(GL_TRIANGLE_FAN);
 
@@ -142,7 +111,7 @@ redraw()
 		if (i == 30)
 		{
 			glEnd();
-			glColor3f(0.1, 0.1, 0.1);
+			glColor4f(0, 1, 0, 1);
 			glBegin(GL_TRIANGLE_FAN);
 			glVertex2f(circle_center.x, circle_center.y);
 			glVertex2f(circle_point.x, circle_point.y);
@@ -151,13 +120,17 @@ redraw()
 
 	glEnd();
 
-	glBegin(GL_QUADS);
-	glActiveTexture(GL_TEXTURE0);
+	glColor4f(1, 1, 0, 1);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexCoord2f(0, 0); glVertex3f(0, 0, 0);
-	glTexCoord2f(0, 1); glVertex3f(0, 100, 0);
-	glTexCoord2f(1, 1); glVertex3f(100, 100, 0);
-	glTexCoord2f(1, 0); glVertex3f(100, 0, 0);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex2f(0.0f, 0.0f);
+	glTexCoord2f(0.0f, 1.0f);
+	glVertex2f(0.0f, texh);
+	glTexCoord2f(1.0f, 1.0f);
+	glVertex2f(texw, texh);
+	glTexCoord2f(1.0f, 0.0f);
+	glVertex2f(texw, 0.0f);
 	glEnd();
 
 	glFinish();
